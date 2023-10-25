@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 from datetime import datetime
 import pyautogui
+import pydirectinput
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -15,21 +16,39 @@ class PanelView(View):
     @discord.ui.button(emoji='📷', style=discord.ButtonStyle.secondary, row=1,)
     async def camera(self, interaction, button):
         await updateInteraction(interaction, "none")
-    @discord.ui.button(emoji='⬆', style=discord.ButtonStyle.primary, custom_id='up_button', row=1)
+        
+    @discord.ui.button(emoji='⬆', style=discord.ButtonStyle.primary, row=1)
     async def up_button(self, interaction, button):
         await updateInteraction(interaction, "up")
-    @discord.ui.button(emoji='🖱️', style=discord.ButtonStyle.secondary, custom_id="click", row=1)
+        
+    @discord.ui.button(emoji='🖱️', style=discord.ButtonStyle.secondary, row=1)
     async def icon(self, interaction, button):
         await updateInteraction(interaction, "click")
-    @discord.ui.button(emoji='⬅', style=discord.ButtonStyle.primary, custom_id='left_button', row=2)
+        
+    @discord.ui.button(emoji='⬅', style=discord.ButtonStyle.primary, row=2)
     async def left_button(self, interaction, button):
         await updateInteraction(interaction, "left")
-    @discord.ui.button(emoji='⬇', style=discord.ButtonStyle.primary, custom_id='down_button', row=2)
-    async def down_button(self, interaction, button):
-        await updateInteraction(interaction, "down")
-    @discord.ui.button(emoji='➡', style=discord.ButtonStyle.primary, custom_id='right_button', row=2)
+        
+    @discord.ui.button(emoji='🔦', style=discord.ButtonStyle.secondary, row=2)
+    async def nightvision_button(self, interaction, button):
+        await updateInteraction(interaction, "nightvision")
+
+    @discord.ui.button(emoji='➡', style=discord.ButtonStyle.primary, row=2)
     async def right_button(self, interaction, button):
         await updateInteraction(interaction, "right")
+    
+    @discord.ui.button(emoji='⏮️', style=discord.ButtonStyle.secondary, row=3)
+    async def farleft_button(self, interaction, button):
+        await updateInteraction(interaction, "farleft")
+        
+    @discord.ui.button(emoji='⬇', style=discord.ButtonStyle.primary, row=3)
+    async def down_button(self, interaction, button):
+        await updateInteraction(interaction, "down")
+        
+    @discord.ui.button(emoji='⏭️', style=discord.ButtonStyle.secondary, row=3)
+    async def farright_button(self, interaction, button):
+        await updateInteraction(interaction, "farright")
+
 
 class EmptyView(View):
     def buttonInit(self):
@@ -47,21 +66,36 @@ async def updateInteraction(interaction, direction):
     await interaction.response.edit_message(content= 'One moment...', view=EmptyView())
     
     if(direction == "up"):
-        pyautogui.moveRel(0, -100, duration=0.25)
+        for i in range(30):
+            pydirectinput.moveRel(0, -10, relative=True)
         await screenShotUpdate(interaction)
     if(direction == "down"):
-        pyautogui.moveRel(0, 100, duration=0.25)
+        for i in range(30):
+            pydirectinput.moveRel(0, 10, relative=True)
         await screenShotUpdate(interaction)
     if(direction == "left"):
-        pyautogui.moveRel(-100, 0, duration=0.25)
+        for i in range(30):
+            pydirectinput.moveRel(-10, 0, relative=True)
         await screenShotUpdate(interaction)
     if(direction == "right"):
-        pyautogui.moveRel(100, 0, duration=0.25)
+        for i in range(30):
+            pydirectinput.moveRel(10, 0, relative=True)
         await screenShotUpdate(interaction)
     if(direction == "none"):
         await screenShotUpdate(interaction)
     if(direction == "click"):
         pyautogui.click()
+        await screenShotUpdate(interaction)
+    if(direction == "farright"):
+        for i in range(95):
+            pydirectinput.moveRel(10, 0, relative=True)
+        await screenShotUpdate(interaction)
+    if(direction == "farleft"):
+        for i in range(95):
+            pydirectinput.moveRel(-10, 0, relative=True)
+        await screenShotUpdate(interaction)
+    if(direction == "nightvision"):
+        pyautogui.press('n')
         await screenShotUpdate(interaction)
 
 async def screenShotUpdate(interaction):
