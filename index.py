@@ -9,8 +9,8 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 class PanelView(View):
-    def __init__(self):
-        super().__init__()
+    def buttonInit(self):
+        super().buttonInit()
 
     @discord.ui.button(emoji='📷', style=discord.ButtonStyle.secondary, row=1,)
     async def camera(self, interaction, button):
@@ -18,9 +18,9 @@ class PanelView(View):
     @discord.ui.button(emoji='⬆', style=discord.ButtonStyle.primary, custom_id='up_button', row=1)
     async def up_button(self, interaction, button):
         await updateInteraction(interaction, "up")
-    @discord.ui.button(emoji='<:axodouble:980969350473326623>', style=discord.ButtonStyle.secondary, disabled=True, row=1)
+    @discord.ui.button(emoji='🖱️', style=discord.ButtonStyle.secondary, custom_id="click", row=1)
     async def icon(self, interaction, button):
-        await interaction.response.send_message("Uhhh, how?")
+        await updateInteraction(interaction, "click")
     @discord.ui.button(emoji='⬅', style=discord.ButtonStyle.primary, custom_id='left_button', row=2)
     async def left_button(self, interaction, button):
         await updateInteraction(interaction, "left")
@@ -31,6 +31,10 @@ class PanelView(View):
     async def right_button(self, interaction, button):
         await updateInteraction(interaction, "right")
 
+class EmptyView(View):
+    def buttonInit(self):
+        super().buttonInit()
+
 @bot.command()
 async def cctv(ctx):
     embed = discord.Embed(title='Remote Control', description='Use the buttons below to control the mouse', color=0x2b2d31)
@@ -40,19 +44,24 @@ async def cctv(ctx):
 
 
 async def updateInteraction(interaction, direction):
+    await interaction.response.edit_message(content= 'One moment...', view=EmptyView())
+    
     if(direction == "up"):
-        pyautogui.moveRel(0, -50)
+        pyautogui.moveRel(0, -100, duration=0.25)
         await screenShotUpdate(interaction)
     if(direction == "down"):
-        pyautogui.moveRel(0, 50)
+        pyautogui.moveRel(0, 100, duration=0.25)
         await screenShotUpdate(interaction)
     if(direction == "left"):
-        pyautogui.moveRel(-50, 0)
+        pyautogui.moveRel(-100, 0, duration=0.25)
         await screenShotUpdate(interaction)
     if(direction == "right"):
-        pyautogui.moveRel(50, 0)
+        pyautogui.moveRel(100, 0, duration=0.25)
         await screenShotUpdate(interaction)
     if(direction == "none"):
+        await screenShotUpdate(interaction)
+    if(direction == "click"):
+        pyautogui.click()
         await screenShotUpdate(interaction)
 
 async def screenShotUpdate(interaction):
@@ -62,7 +71,9 @@ async def screenShotUpdate(interaction):
     embed = discord.Embed(title='Remote Control', description='Use the buttons below to control the mouse', color=0x2b2d31)
     embed.set_image(url='attachment://screenshot.png')
     # Update the message
-    await interaction.response.edit_message(embed=embed, attachments=[discord.File('screenshot.png')])
+    await interaction.message.edit(content="CCTV Camera, last updated <t:" + # Timestamp
+        str(int(datetime.now().timestamp()))
+        + ":R>", embed=embed, attachments=[discord.File('screenshot.png')], view=PanelView())
 
 
-bot.run("OTEwMjM5NDM0NDcyMDMwMjQ5.GThtnN.ldsTlriykd-iadrLdlr-DXCtSc2FlL6pfxvkcs")
+bot.run("")
