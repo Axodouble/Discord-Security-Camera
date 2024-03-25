@@ -1,3 +1,4 @@
+import os
 import discord
 from discord.ext import commands
 from discord.ui import Button, View
@@ -113,4 +114,4 @@ async def screenShotUpdate(interaction):
         + ":R>", embed=embed, attachments=[discord.File('screenshot.png')], view=PanelView())
 
 
-bot.run("")
+bot.run(os.environ['TOKEN'])
